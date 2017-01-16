@@ -47,6 +47,9 @@ def render_journal(username):
     text_file = open("journaldata.txt", "r")
     curr_data = json.loads(text_file.read())
     text_file.close()
+    show_data = curr_data[username]
+    for i in show_data:
+        print i
     return """
     <p>Welcome to your Journal!</p>
     <form method="get" action="/update_action">
@@ -55,23 +58,27 @@ def render_journal(username):
     <input type="submit">
     </form>
     <p>{1}</p>
-    """.format(username,curr_data)
+    """.format(username,show_data)
 
 @app.route("/update_action")
 def update_journal():
+    # get the input from the user
     username = request.args.get('username')
     journal_input = request.args.get('journal_input')
+    #read the current data from the file
     text_file = open("journaldata.txt", "r")
     curr_data = json.loads(text_file.read())
     text_file.close()
+    curr_array = curr_data[username]
+    print curr_array
     # insert journal_input into curr_data to make new data
-    curr_data[username] = journal_input
+    curr_array.append(journal_input)
     new_data = curr_data
     text_file = open("journaldata.txt", "w")
     output = json.dumps(new_data)
     text_file.write(output)
     text_file.close()
-    return redirect("/journal/<username>".format(username))
+    return redirect("/journal/{0}".format(username))
 
 
 def read_data():
