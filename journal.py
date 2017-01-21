@@ -3,12 +3,13 @@ from flask import Flask, redirect, request
 import json
 import random
 import string
+import cgi
 
 app = Flask(__name__)
 
 @app.route("/mydebug")
 def state():
-    count = read_data()
+    count = read_userdata()
     return json.dumps(count)
 
 @app.route("/login")
@@ -37,7 +38,7 @@ def login():
 def login_action():
     username = request.args.get('username')
     password = request.args.get('password')
-    x = read_data()
+    x = read_userdata()
     if username in x.keys():
         stored_password = x.get(username)
         if stored_password == password:
@@ -80,7 +81,7 @@ def signup():
 def signup_action():
     username = request.args.get('username')
     password = request.args.get('password')
-    x = read_data()
+    x = read_userdata()
     if username in x.keys():
         return """
         <p>There is already an account with that username</p>
@@ -100,11 +101,9 @@ def signup_action():
 
 @app.route("/journal/<username>")
 def render_journal(username):
-    text_file = open("journaldata.txt", "r")
-    curr_data = json.loads(text_file.read())
-    text_file.close()
-    print "username is ", username
-    print curr_data
+    curr_data = read_journaldata()
+    #print "username is ", username
+    #print curr_data
     if not username in curr_data.keys():
             return """
             <!DOCTYPE html>
@@ -164,16 +163,15 @@ def update_journal():
     # get the input from the user
     username = request.args.get('username')
     journal_input = request.args.get('journal_input')
+    sanitized_input = cgi.escape(journal_input)
     #read the current data from the file
-    text_file = open("journaldata.txt", "r")
-    curr_data = json.loads(text_file.read())
-    text_file.close()
+    curr_data = read_journaldata()
     if not username in curr_data.keys():
         curr_data[username] = []
         curr_array = curr_data[username]
-        print curr_array
+        #print curr_array
         # insert journal_input into curr_data to make new data
-        curr_array.append(journal_input)
+        curr_array.append(sanitized_input)
         new_data = curr_data
         text_file = open("journaldata.txt", "w")
         output = json.dumps(new_data)
@@ -182,18 +180,15 @@ def update_journal():
         return redirect("/journal/{0}".format(username))
     else:
         curr_array = curr_data[username]
-        print curr_array
-        # insert journal_input into curr_data to make new data
-        curr_array.append(journal_input)
+        #print curr_array
+        # insert sanitized_input into curr_data to make new data
+        curr_array.append(sanitized_input)
         new_data = curr_data
-        text_file = open("journaldata.txt", "w")
-        output = json.dumps(new_data)
-        text_file.write(output)
-        text_file.close()
+        write_journaldata(new_data)
         return redirect("/journal/{0}".format(username))
 
 
-def read_data():
+def read_userdata():
     try:
         text_file = open("user.txt", "r")
         data = json.loads(text_file.read())
@@ -201,6 +196,26 @@ def read_data():
     except:
         data = {}
     return data
+
+
+def read_journaldata():
+    try:
+        text_file = open("journaldata.txt", "r")
+        data = json.loads(text_file.read())
+        text_file.close()
+    except:
+        data = {}
+    return data
+
+def write_journaldata(new_data):
+    try:
+        text_file = open("journaldata.txt", "w")
+        output = json.dumps(new_data)
+        text_file.write(output)
+        text_file.close()
+    except:
+        output = {}
+    return output
 
 if __name__ == "__main__":
     app.run(debug=True)
