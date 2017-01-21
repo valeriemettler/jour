@@ -14,12 +14,22 @@ def state():
 @app.route("/login")
 def login():
     return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <title>Jour</title>
+    <link rel="stylesheet" type="text/css" href="./journal.css">
+    </head>
+    <body>
     <p>Enter Username and Password</p>
     <form method="get" action="/login_action">
     <input type="text" name="username" />
     <input type="password" name="password" />
     <input type="submit">
     </form>
+    </body>
+    </html>
     """.format()
 
 @app.route("/login_action")
@@ -42,23 +52,51 @@ def login_action():
         <a href="/login">Return to Login</a>
         """
 
+
+
 @app.route("/journal/<username>")
 def render_journal(username):
     text_file = open("journaldata.txt", "r")
     curr_data = json.loads(text_file.read())
     text_file.close()
+    print "username is ", username
+    print curr_data
     show_data = curr_data[username]
+    x = ""
     for i in show_data:
-        print i
+        x = x + '<p class='"todo"'>{}</p>'.format(i)
     return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <title>Jour</title>
+    <link rel="stylesheet" type="text/css" href="./journal.css">
+    </head>
+    <body>
     <p>Welcome to your Journal!</p>
     <form method="get" action="/update_action">
     <input type="text" name="journal_input" />
     <input type="text" name="username" value="{0}" hidden="true" />
     <input type="submit">
     </form>
-    <p>{1}</p>
-    """.format(username,show_data)
+    <div>{1}</div>
+    </form>
+    </body>
+    </html>
+    """.format(username,x)
+
+@app.route("/journal/journal.css")
+def render_css():
+    #put css in a file, read the file and then send it (instead of having it inline in the program)
+    css =  """
+    .todo {
+        border-bottom: 1px solid black;
+        padding-bottom: 5px;
+    }
+    """
+    return css, 200, {'Content-Type' : 'text/css'}
+
 
 @app.route("/update_action")
 def update_journal():
