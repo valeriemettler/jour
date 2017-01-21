@@ -89,14 +89,10 @@ def render_journal(username):
 @app.route("/journal/journal.css")
 def render_css():
     #put css in a file, read the file and then send it (instead of having it inline in the program)
-    css =  """
-    .todo {
-        border-bottom: 1px solid black;
-        padding-bottom: 5px;
-    }
-    """
-    return css, 200, {'Content-Type' : 'text/css'}
-
+    text_file = open("journal.css", "r")
+    curr_css = text_file.read()
+    text_file.close()
+    return curr_css, 200, {'Content-Type' : 'text/css' }
 
 @app.route("/update_action")
 def update_journal():
