@@ -116,6 +116,7 @@ def render_journal(username):
             </head>
             <body>
             <p>Welcome to your Journal!</p>
+            <p><a href="/login">Log Out</a></p>
             <form method="get" action="/update_action">
             <input type="text" name="journal_input" />
             <input type="text" name="username" value="{0}" hidden="true" />
@@ -139,6 +140,7 @@ def render_journal(username):
         </head>
         <body>
         <p>Welcome to your Journal!</p>
+        <p><a href="/login">Log Out</a></p>
         <form method="get" action="/update_action">
         <input type="text" name="journal_input" />
         <input type="text" name="username" value="{0}" hidden="true" />
