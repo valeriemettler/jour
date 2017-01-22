@@ -42,7 +42,12 @@ def login_action():
     if username in x.keys():
         stored_password = x.get(username)
         if stored_password == password:
-            return redirect("/journal/{0}".format(username))
+            #generate random secret for cookie
+            cookie = ''.join(random.choice(string.ascii_lowercase) for _ in range(20))
+            #print cookie
+            #set cookie in user's browser
+            return redirect("/journal/{0}".format(username)), {'Set-Cookie' : 'name=bowwow'}
+            ##todo next: get the cookie back and verify it
         else:
             return """
         <p>incorrect password</p>
